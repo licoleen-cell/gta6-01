@@ -97,6 +97,14 @@ function dressStreet(world, row, col) {
   }
 }
 
+/** Clear the momentary damage white-out so a still shows each car's paint, not a hit frame. */
+function settlePaint(world, car) {
+  car.flash = 0;
+  car.smoke = 0;
+  for (const other of world.traffic.cars) other.flash = 0;
+  for (const other of world.police.cars) other.flash = 0;
+}
+
 function snapCamera(world, x, y, zoom) {
   world.camera.x = x;
   world.camera.y = y;
@@ -157,7 +165,7 @@ function sceneChase(world, random) {
   // Traffic ahead and behind, so the street is not a private road.
   dressStreet(world, row, col + 1);
 
-  snapCamera(world, car.x + 40, car.y - 10, 1.24);
+  snapCamera(world, car.x + 40, car.y + 2, 1.2);
   const fixed = { x: 0, y: -1 };
   for (let i = 0; i < 46; i += 1) {
     world.step = STEP;
@@ -165,7 +173,7 @@ function sceneChase(world, random) {
     world.player.car = car;
     stepFixed(world, controls(fixed, { handbrake: false }), 1);
     // Keep the camera glued: this frame is a portrait, not a follow.
-    snapCamera(world, car.x + 40, car.y - 10, 1.24 - speed * 0.06);
+    snapCamera(world, car.x + 40, car.y + 2, 1.2 - speed * 0.06);
   }
   // A touch of body english on the wheel and lights mid-flash.
   car.steer = 0.1;
@@ -173,6 +181,11 @@ function sceneChase(world, random) {
   tail2.siren = 0.28;
   oncoming.siren = 0.94;
   world.wanted.flash = 0.9;
+  // The cover is the chase itself: the job banner and the objective card already name what is
+  // happening, so the three-line briefing card is kept out of the middle of the frame.
+  world.briefing = [];
+  world.briefingTimer = 0;
+  settlePaint(world, car);
   return { screen: SCREEN_PLAY };
 }
 
@@ -199,12 +212,15 @@ function sceneStreets(world) {
   world.player.y = car.y;
   world.player.facing = 0;
   dressStreet(world, row, col + 1);
-  snapCamera(world, car.x + 90, car.y - 6, 1.16);
+  // Held a little south of the car: the avenue's oncoming lane sits below the player, and this
+  // lifts the near traffic clear of the bottom edge instead of cutting a car on it.
+  snapCamera(world, car.x + 90, car.y + 4, 1.16);
   for (let i = 0; i < 34; i += 1) {
     stepFixed(world, controls({ x: 0, y: -1 }), 1);
-    snapCamera(world, car.x + 90, car.y - 6, 1.16);
+    snapCamera(world, car.x + 90, car.y + 4, 1.16);
   }
   car.speed = 168;
+  settlePaint(world, car);
   return { screen: SCREEN_PLAY };
 }
 

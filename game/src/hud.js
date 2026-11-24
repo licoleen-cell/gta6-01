@@ -210,7 +210,7 @@ export function drawHud(ctx, view, world) {
   text(ctx, world.waypoint ? `${dist} m · ${world.waypoint.label}` : 'No active job', cardX + 14, pad + 84, 11, 'rgba(255,255,255,0.62)', 'left', 600, FONT_MONO);
 
   /* --- bottom left: minimap ------------------------------------------ */
-  const mapSize = narrow ? 132 : 176;
+  const mapSize = narrow ? 132 : 198;
   minimap(ctx, world, pad, view.h - pad - mapSize, mapSize);
   // Health pip under the map.
   const hpY = view.h - pad + 4;
